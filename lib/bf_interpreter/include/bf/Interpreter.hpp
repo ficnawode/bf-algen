@@ -33,7 +33,7 @@ namespace bf
         std::string _output;
         bool _hasError = false;
 
-        static constexpr uint16_t _maxCycles = 1024;
+        static constexpr uint16_t _maxCycles = 10 * 1024;
         static constexpr uint16_t _tapeSize = 1024;
 
         std::uint16_t _instructionPointer = 0;
