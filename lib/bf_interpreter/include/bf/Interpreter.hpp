@@ -13,33 +13,32 @@ namespace bf
         static std::optional<std::string> Interpret(const std::string& source_code);
 
     private:
-        Interpreter(const std::string source_code);
+        Interpreter(const std::string& source_code);
         std::optional<std::string> Interpret();
-        void HandleOperation(char op);
+
+        void HandleOperation(const char op);
 
         void IncrementPointer();
         void DecrementPointer();
         void IncrementValue();
         void DecrementValue();
         void OutputByte();
-
         void BeginLoop();
         void EndLoop();
 
-        int FindLoopMatch(int direction);
+        std::int16_t FindLoopMatch(std::int16_t direction);
         bool CheckSyntax();
 
-        static constexpr unsigned int _maxCycles = 1024;
-        static constexpr unsigned int _tapeSize = 1024;
-        static constexpr std::string ERROR = "Error";
-
-        std::string _program;
+        const std::string& _program;
         std::string _output;
         bool _hasError = false;
 
-        std::ptrdiff_t _instructionPointer = 0;
-        std::ptrdiff_t _totalCycles = 0;
-        std::ptrdiff_t _tapePointer = 0;
+        static constexpr uint16_t _maxCycles = 1024;
+        static constexpr uint16_t _tapeSize = 1024;
+
+        std::uint16_t _instructionPointer = 0;
+        std::uint16_t _totalCycles = 0;
+        std::uint16_t _tapePointer = 0;
         std::array<std::uint8_t, _tapeSize> _tape;
     };
 }

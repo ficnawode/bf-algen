@@ -4,7 +4,7 @@
 namespace bf
 {
 
-    Interpreter::Interpreter(const std::string source_code) :
+    Interpreter::Interpreter(const std::string& source_code) :
         _program{source_code}, _output{""}
     {
         std::memset(_tape.data(), 0, _tape.size());
@@ -20,13 +20,13 @@ namespace bf
     {
         if(!CheckSyntax())
         {
-            return Interpreter::ERROR;
+            return {};
         }
 
         while(_instructionPointer < _program.length())
         {
             if(_totalCycles > _maxCycles || _hasError)
-                return Interpreter::ERROR;
+                return {};
             HandleOperation(_program[_instructionPointer]);
 
             ++_instructionPointer;
@@ -108,7 +108,7 @@ namespace bf
             _instructionPointer = FindLoopMatch(-1);
     }
 
-    int Interpreter::FindLoopMatch(int direction)
+    std::int16_t Interpreter::FindLoopMatch(std::int16_t direction)
     {
         int num_nested_loops = 1; // We count the current loop as a nested loop.
         int instructionPointerTmp = _instructionPointer + direction;
