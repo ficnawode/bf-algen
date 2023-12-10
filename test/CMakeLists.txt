@@ -7,7 +7,8 @@ PUBLIC
     gtest 
     gtest_main
     
-    dummy
+    bf_interpreter
+
 )
 
 target_include_directories(${NAME}
@@ -17,7 +18,7 @@ PRIVATE
 
 target_sources(${NAME}
 PRIVATE
-    src/dummy_test.cpp
+    src/bf_interpreter_tests.cpp
 )
 
 add_custom_target(${NAME}.run

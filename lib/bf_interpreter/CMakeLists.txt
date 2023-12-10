@@ -1,4 +1,4 @@
-set(NAME dummy)
+set(NAME bf_interpreter)
 
 add_library(${NAME} STATIC)
 
@@ -14,6 +14,6 @@ PUBLIC
 
 target_sources(${NAME}
 PRIVATE
-    include/dummy/dummy.hpp
-    src/dummy.cpp
+    include/bf/Interpreter.hpp
+    src/Interpreter.cpp
 )

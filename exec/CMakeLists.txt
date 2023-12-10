@@ -4,7 +4,7 @@ add_executable(${NAME})
 
 target_link_libraries(${NAME}
 PRIVATE
-    dummy
+    bf_interpreter
 )
 
 target_sources(${NAME}

@@ -1,8 +1,8 @@
 #include <iostream>
-#include "dummy/dummy.hpp"
+#include "bf/Interpreter.hpp"
 
 int main()
 {
-    std::cout << "HELLO, WORLD! 5+3 = " << dummy::add(5, 3) << std::endl;
+    std::cout << "HELLO, WORLD!" << std::endl;
     return 0;
 }
