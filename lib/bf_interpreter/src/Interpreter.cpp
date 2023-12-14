@@ -1,4 +1,5 @@
 #include "bf/Interpreter.hpp"
+#include <cassert>
 #include <cstring>
 
 namespace bf
@@ -18,11 +19,6 @@ namespace bf
 
     std::optional<std::string> Interpreter::Interpret()
     {
-        if(!CheckSyntax())
-        {
-            return {};
-        }
-
         while(_instructionPointer < _program.length())
         {
             if(_totalCycles > _maxCycles || _hasError)
@@ -59,8 +55,6 @@ namespace bf
             break;
         case ']':
             EndLoop();
-            break;
-        default:
             break;
         }
     }
@@ -108,28 +102,33 @@ namespace bf
             _instructionPointer = FindLoopMatch(-1);
     }
 
-    std::int16_t Interpreter::FindLoopMatch(std::int16_t direction)
+    std::uint16_t Interpreter::FindLoopMatch(const std::int8_t direction)
     {
-        int num_nested_loops = 1; // We count the current loop as a nested loop.
-        int instructionPointerTmp = _instructionPointer + direction;
+        assert(direction == -1 || direction == 1);
+        uint16_t numNestedLoops = 1;
+        uint16_t instructionPointerTmp = _instructionPointer + direction;
 
-        /* We need to walk through the program to figure out where the end of the loop is, by counting how many nested loops there are.
-           Count either backwards or forwards depending on direction. */
-        while(num_nested_loops > 0)
+        if(instructionPointerTmp == INT16_MAX)
         {
-            if(instructionPointerTmp < 0 ||
-               instructionPointerTmp >= static_cast<int>(_program.length()))
+            _hasError = true;
+            return 0;
+        }
+
+        while(numNestedLoops > 0)
+        {
+            if(instructionPointerTmp == 0 ||
+               instructionPointerTmp >= static_cast<std::uint16_t>(_program.length()))
             {
                 _hasError = true;
-                return -1; // -1 has no meaning. Just needed to return.
+                return 0;
             }
 
             char c = _program[instructionPointerTmp];
 
             if(c == '[')
-                num_nested_loops += (direction > 0 ? 1 : -1);
+                numNestedLoops += direction;
             else if(c == ']')
-                num_nested_loops += (direction > 0 ? -1 : 1);
+                numNestedLoops -= direction;
 
             instructionPointerTmp += direction;
         }
@@ -137,22 +136,4 @@ namespace bf
         return instructionPointerTmp;
     }
 
-    bool Interpreter::CheckSyntax()
-    {
-        for(size_t i = 0; i < _program.length(); ++i)
-        {
-            _instructionPointer = i;
-
-            if(_program[i] == '[')
-                FindLoopMatch(1);
-            else if(this->_program[i] == ']')
-                FindLoopMatch(-1);
-
-            if(_hasError)
-                return false;
-        }
-
-        _instructionPointer = 0;
-        return true;
-    }
 }

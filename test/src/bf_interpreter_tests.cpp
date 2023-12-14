@@ -10,15 +10,34 @@ namespace
         std::string src =
             "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
             "++++++++++++++++++++++++++++++++++++++.---.+++++++..+++.";
-        EXPECT_EQ(bf::Interpreter::Interpret(src), "hello");
+        ASSERT_EQ(bf::Interpreter::Interpret(src), "hello");
     }
 
-    TEST(interpreter_tests, error)
+    TEST(interpreter_tests, open_brace_error)
     {
         std::string src =
-            "[+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+            "[++++[++++][[[]]++++++++++++++++++++++++++++++++++++++++++++++++++"
             "+++++++++++++++++++++++++++++++++++++++.---.+++++++..+++.";
-        EXPECT_EQ(bf::Interpreter::Interpret(src), std::nullopt);
+        ASSERT_EQ(bf::Interpreter::Interpret(src), std::nullopt);
+    }
+
+    TEST(interpreter_tests, closed_brace_error)
+    {
+        std::string src =
+            "[++++[++++][[[]]]]++++++++++++++++++++++++++++++++++++++++++++++++"
+            "++"
+            "+++++++++++++++++++++++++++++++++++++++.---.+++++++..+++.";
+        ASSERT_EQ(bf::Interpreter::Interpret(src), std::nullopt);
+    }
+
+    TEST(interpreter_tests, closed_brace_nonerror)
+    {
+        std::string src =
+            "]]]]++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+            "++"
+            "+"
+            "+++++++++++++++++++++++++++++++++++++++.---.+++++++..+++.";
+        ASSERT_EQ(bf::Interpreter::Interpret(src), "hello");
     }
 
     TEST(interpreter_tests, hello_world)
@@ -36,6 +55,6 @@ namespace
             "------."
             "--------."
             ">>>++++[<++++++++>-]<+.";
-        EXPECT_EQ(bf::Interpreter::Interpret(src), "Hello, World!");
+        ASSERT_EQ(bf::Interpreter::Interpret(src), "Hello, World!");
     }
 }

@@ -26,15 +26,14 @@ namespace bf
         void BeginLoop();
         void EndLoop();
 
-        std::int16_t FindLoopMatch(std::int16_t direction);
-        bool CheckSyntax();
+        std::uint16_t FindLoopMatch(std::int8_t direction);
 
         const std::string& _program;
         std::string _output;
         bool _hasError = false;
 
-        static constexpr uint16_t _maxCycles = 10 * 1024;
-        static constexpr uint16_t _tapeSize = 1024;
+        static constexpr std::uint16_t _maxCycles = 10 * 1024;
+        static constexpr std::uint16_t _tapeSize = 1024;
 
         std::uint16_t _instructionPointer = 0;
         std::uint16_t _totalCycles = 0;
