@@ -8,7 +8,7 @@ PUBLIC
     gtest_main
     
     bf_interpreter
-
+    util
 )
 
 target_include_directories(${NAME}
@@ -19,6 +19,7 @@ PRIVATE
 target_sources(${NAME}
 PRIVATE
     src/bf_interpreter_tests.cpp
+    src/util_tests.cpp
 )
 
 add_custom_target(${NAME}.run
