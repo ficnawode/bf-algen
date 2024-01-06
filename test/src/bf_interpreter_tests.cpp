@@ -1,16 +1,17 @@
 
 #include "gtest/gtest.h"
-#include "bf/Interpreter.hpp"
+#include "bf_interpreter/Interpreter.hpp"
 
 namespace
 {
+    using namespace bf_interpreter;
 
     TEST(interpreter_tests, hello)
     {
         std::string src =
             "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
             "++++++++++++++++++++++++++++++++++++++.---.+++++++..+++.";
-        ASSERT_EQ(bf::Interpreter::Interpret(src), "hello");
+        ASSERT_EQ(Interpreter::Interpret(src), "hello");
     }
 
     TEST(interpreter_tests, open_brace_error)
@@ -18,7 +19,7 @@ namespace
         std::string src =
             "[++++[++++][[[]]++++++++++++++++++++++++++++++++++++++++++++++++++"
             "+++++++++++++++++++++++++++++++++++++++.---.+++++++..+++.";
-        ASSERT_EQ(bf::Interpreter::Interpret(src), std::nullopt);
+        ASSERT_EQ(Interpreter::Interpret(src), std::nullopt);
     }
 
     TEST(interpreter_tests, closed_brace_error)
@@ -29,7 +30,7 @@ namespace
             "+"
             "++"
             "+++++++++++++++++++++++++++++++++++++++.---.+++++++..+++.";
-        ASSERT_EQ(bf::Interpreter::Interpret(src), std::nullopt);
+        ASSERT_EQ(Interpreter::Interpret(src), std::nullopt);
     }
 
     TEST(interpreter_tests, closed_brace_nonerror)
@@ -39,7 +40,7 @@ namespace
             "++"
             "+"
             "+++++++++++++++++++++++++++++++++++++++.---.+++++++..+++.";
-        ASSERT_EQ(bf::Interpreter::Interpret(src), "hello");
+        ASSERT_EQ(Interpreter::Interpret(src), "hello");
     }
 
     TEST(interpreter_tests, hello_world)
@@ -57,6 +58,6 @@ namespace
             "------."
             "--------."
             ">>>++++[<++++++++>-]<+.";
-        ASSERT_EQ(bf::Interpreter::Interpret(src), "Hello, World!");
+        ASSERT_EQ(Interpreter::Interpret(src), "Hello, World!");
     }
 }

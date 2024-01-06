@@ -1,2 +1,3 @@
+add_subdirectory(bf_code_generator)
 add_subdirectory(bf_interpreter)
 add_subdirectory(util)

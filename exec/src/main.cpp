@@ -1,5 +1,5 @@
 #include <iostream>
-#include "bf/Interpreter.hpp"
+#include "bf_interpreter/Interpreter.hpp"
 
 int main()
 {

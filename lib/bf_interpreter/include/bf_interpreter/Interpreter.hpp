@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-namespace bf
+namespace bf_interpreter
 {
     class Interpreter
     {

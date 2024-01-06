@@ -1,8 +1,8 @@
-#include "bf/Interpreter.hpp"
+#include "bf_interpreter/Interpreter.hpp"
 #include <cassert>
 #include <cstring>
 
-namespace bf
+namespace bf_interpreter
 {
 
     Interpreter::Interpreter(const std::string& source_code) :

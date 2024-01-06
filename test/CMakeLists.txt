@@ -18,6 +18,7 @@ PRIVATE
 
 target_sources(${NAME}
 PRIVATE
+    src/bf_codegen_tests.cpp
     src/bf_interpreter_tests.cpp
     src/util_tests.cpp
 )

@@ -5,6 +5,7 @@ add_executable(${NAME})
 target_link_libraries(${NAME}
 PRIVATE
     bf_interpreter
+    bf_code_generator
 )
 
 target_sources(${NAME}

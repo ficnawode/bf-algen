@@ -1,4 +1,4 @@
-set(NAME bf_interpreter)
+set(NAME bf_code_generator)
 
 add_library(${NAME} STATIC)
 
@@ -14,6 +14,6 @@ PUBLIC
 
 target_sources(${NAME}
 PRIVATE
-    include/bf_interpreter/Interpreter.hpp
-    src/Interpreter.cpp
+    include/bf_code_generator/BfCodeGenerator.hpp
+    src/BfCodeGenerator.cpp
 )
