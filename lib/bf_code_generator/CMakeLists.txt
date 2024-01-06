@@ -5,6 +5,8 @@ add_library(${NAME} STATIC)
 target_link_libraries(${NAME} 
 PUBLIC
     Microsoft.GSL::GSL
+    bf_interpreter
+    util
 )
 
 target_include_directories(${NAME}
@@ -14,6 +16,8 @@ PUBLIC
 
 target_sources(${NAME}
 PRIVATE
-    include/bf_code_generator/BfCodeGenerator.hpp
-    src/BfCodeGenerator.cpp
+    include/bf_code_generator/GeneticCodeGenerator.hpp
+    include/bf_code_generator/Genotype.hpp
+    include/bf_code_generator/fwd.hpp
+    src/GeneticCodeGenerator.cpp
 )
