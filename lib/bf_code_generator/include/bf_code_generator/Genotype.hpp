@@ -1,24 +1,18 @@
 #pragma once
+#include "bf_code_generator/fwd.hpp"
 
-#include "bf_code_generator/GeneticCodeGenerator.hpp"
+#include <functional>
+#include <string>
 
 namespace bf_code_generator
 {
     class Genotype
     {
     public:
-        Genotype(const GeneticCodeGenerator* generator) :
-            _generator{generator},
-            _program{generator->CreateRandomProgram()},
-            _score{generator->CalculateFitness(_program)}
+        Genotype(std::string program, std::function<double(std::string&)> FitnessFunction) :
+            _program{program}, _fitnessFunction{FitnessFunction}
         {
-        }
-
-        Genotype(const GeneticCodeGenerator* generator, std::string program) :
-            _generator{generator},
-            _program{program},
-            _score{generator->CalculateFitness(program)}
-        {
+            _score = _fitnessFunction(_program);
         }
 
         Genotype(Genotype&& g) = default;
@@ -37,7 +31,12 @@ namespace bf_code_generator
         void SetProgram(const std::string program)
         {
             _program = program;
-            _score = _generator->CalculateFitness(_program);
+            _score = _fitnessFunction(_program);
+        }
+
+        auto operator==(const Genotype& g)
+        {
+            return _score == g.GetScore();
         }
 
         auto operator<=>(const Genotype& g)
@@ -50,6 +49,6 @@ namespace bf_code_generator
     private:
         std::string _program;
         double _score;
-        const GeneticCodeGenerator* _generator;
+        std::function<double(std::string&)> _fitnessFunction;
     };
 }

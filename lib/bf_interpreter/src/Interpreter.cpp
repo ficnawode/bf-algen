@@ -64,7 +64,9 @@ namespace bf_interpreter
         ++_tapePointer;
 
         if(_tapePointer >= _tapeSize)
+        {
             _hasError = true;
+        }
     }
 
     void Interpreter::DecrementPointer()
@@ -72,32 +74,59 @@ namespace bf_interpreter
         --_tapePointer;
 
         if(_tapePointer < 0)
+        {
             _hasError = true;
+        }
     }
 
     void Interpreter::IncrementValue()
     {
+        if(_tapePointer >= _tapeSize || _tapePointer < 0)
+        {
+            _hasError = true;
+            return;
+        }
         ++_tape[_tapePointer];
     }
 
     void Interpreter::DecrementValue()
     {
+        if(_tapePointer >= _tapeSize || _tapePointer < 0)
+        {
+            _hasError = true;
+            return;
+        }
         --_tape[_tapePointer];
     }
 
     void Interpreter::OutputByte()
     {
+        if(_tapePointer >= _tapeSize || _tapePointer < 0)
+        {
+            _hasError = true;
+            return;
+        }
         _output += _tape[_tapePointer];
     }
 
     void Interpreter::BeginLoop()
     {
+        if(_tapePointer >= _tapeSize || _tapePointer < 0)
+        {
+            _hasError = true;
+            return;
+        }
         if(!_tape[_tapePointer])
             _instructionPointer = FindLoopMatch(1) - 1;
     }
 
     void Interpreter::EndLoop()
     {
+        if(_tapePointer >= _tapeSize || _tapePointer < 0)
+        {
+            _hasError = true;
+            return;
+        }
         if(_tape[_tapePointer])
             _instructionPointer = FindLoopMatch(-1);
     }

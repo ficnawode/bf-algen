@@ -33,7 +33,7 @@ namespace bf_interpreter
         bool _hasError = false;
 
         static constexpr std::uint16_t _maxCycles = 10 * 1024;
-        static constexpr std::uint16_t _tapeSize = 1024;
+        static constexpr std::uint16_t _tapeSize = 16 * 1024;
 
         std::uint16_t _instructionPointer = 0;
         std::uint16_t _totalCycles = 0;
