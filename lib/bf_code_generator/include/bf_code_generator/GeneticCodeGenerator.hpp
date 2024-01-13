@@ -4,6 +4,7 @@
 #include <functional>
 #include <span>
 #include <string>
+#include <unordered_set>
 #include <vector>
 #include "bf_code_generator/Genotype.hpp"
 #include "bf_code_generator/fwd.hpp"
@@ -24,36 +25,43 @@ namespace bf_code_generator
 
         std::function<double(std::string&)> CalculateFitness = [&](const std::string& program)
         {
-            // The score of the worst program possible (Besides erroneous program, and not taking into account program length).
-            double max_score = _goalOutput.size() * CHAR_SIZE;
-            double score = 0;
-
             using namespace bf_interpreter;
             auto interpreter_output = Interpreter::Interpret(program);
             if(!interpreter_output.has_value())
                 return _errorScore;
             auto output = interpreter_output.value();
+            double max_score = _goalOutput.length() * CHAR_SIZE;
 
-            std::string min_str =
-                (output.length() < _goalOutput.length()) ? output : _goalOutput;
-            std::string max_str =
-                (output.length() >= _goalOutput.length()) ? output : _goalOutput;
-
-            for(size_t i = 0; i < max_str.length(); ++i)
+            std::string min_str, max_str;
+            if(output.length() < _goalOutput.length())
             {
-                unsigned output_char;
-                if(i < min_str.length())
-                    output_char = min_str[i];
-                else
-                    output_char = max_str[i] + CHAR_SIZE;
+                min_str = output;
+                max_str = _goalOutput;
+            }
+            else
+            {
+                min_str = _goalOutput;
+                max_str = output;
+            }
 
-                score += abs(output_char - max_str[i]);
+            double score = 0;
+            for(int i = 0; i < max_str.length(); i++)
+            {
+                uint16_t min_char;
+                if(i < min_str.length())
+                {
+                    min_char = min_str[i];
+                }
+                else
+                {
+                    min_char = max_str[i] + CHAR_SIZE;
+                }
+                score += abs(max_str[i] - min_char);
             }
 
             score += (program.length() * _lengthPenalty);
-            double final_score = max_score - score;
 
-            return final_score;
+            return max_score - score;
         };
 
         std::function<std::string(const std::string, unsigned)> AddRandomInstruction =
@@ -103,14 +111,12 @@ namespace bf_code_generator
 
         std::uint16_t _minProgramSize = 10;
         std::uint16_t _maxProgramSize = 500;
-        std::uint16_t _populationSize = 10;
-        std::uint16_t _numOfCrossovers = 3;
+        std::uint16_t _populationSize = 12;
+        std::uint16_t _numOfCrossovers = 2;
         double _mutationRate = 0.01;
-        double _errorScore = 2.0;
+        double _errorScore = 1.0;
         double _lengthPenalty = 0.01;
-        std::uint16_t _displayRate = 10000;
-
-        // Don't modify this group of constants.
+        std::uint16_t _displayRate = 6000;
 
         static constexpr unsigned CHAR_SIZE = 255;
         static constexpr std::array Instructions = {'+', '-', '>', '<', '[', ']', '.'};

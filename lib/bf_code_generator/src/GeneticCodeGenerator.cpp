@@ -1,5 +1,6 @@
 #include "bf_code_generator/GeneticCodeGenerator.hpp"
 #include <algorithm>
+#include <chrono>
 #include "bf_interpreter/Interpreter.hpp"
 #include "util/util.hpp"
 
@@ -26,12 +27,15 @@ namespace bf_code_generator
         bool keep_going = false; // Just used to have the program keep searching after a match is found.
 
         unsigned long generations = 0;
+        auto start_time = std::chrono::high_resolution_clock::now();
+        int nGenerations = 0;
 
         while(1)
         {
             SortPopulation();
             int worst_program_index = _population.size() - 1;
             best_program = _population[0].GetProgram();
+            nGenerations++;
 
             // crossover
             for(int i = 0; i < _numOfCrossovers; i++)
@@ -40,15 +44,15 @@ namespace bf_code_generator
                 auto& parent2 = SelectParent(parent1.GetProgram());
 
                 auto children = Mate(parent1.GetProgram(), parent2.GetProgram());
-                parent1.SetProgram(children[0]);
-                parent2.SetProgram(children[1]);
+                parent1.SetProgram(Mutate(children[0]));
+                parent2.SetProgram(Mutate(children[1]));
             }
 
-#pragma omp parralel for
-            for(auto& g: _population)
-            {
-                g.SetProgram(Mutate(g.GetProgram()));
-            }
+            // #pragma omp parralel for
+            // for(auto& g: _population)
+            // {
+            //     g.SetProgram(Mutate(g.GetProgram()));
+            // }
 
             // elitism
             if(!ProgramExists(best_program))
@@ -61,10 +65,19 @@ namespace bf_code_generator
 
                 auto output = bf_interpreter::Interpreter::Interpret(best_program);
                 std::cout << "\nOutput: " << output.value_or("Error") << std::endl;
+                std::cout << "loss func: " << CalculateFitness(best_program) << std::endl;
 
                 if(output == _goalOutput && !keep_going)
                 {
                     std::cout << "\n\a\a\aProgram evolved!" << std::endl;
+                    auto end_time = std::chrono::high_resolution_clock::now();
+
+                    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        end_time - start_time);
+
+                    std::cout << "Time taken: " << duration.count()
+                              << " seconds" << std::endl;
+                    std::cout << "Number of generations: " << nGenerations << std::endl;
                     std::cout << "Save source code as a text file? (y/n) ";
 
                     char answer;
@@ -83,6 +96,8 @@ namespace bf_code_generator
 
                     if(answer != 'y')
                         return;
+                    _mutationRate = 0.05;
+                    _lengthPenalty = 0.01;
 
                     keep_going = true;
                 }
@@ -143,7 +158,7 @@ namespace bf_code_generator
 
     Genotype& GeneticCodeGenerator::SelectParent(const std::string other_parent)
     {
-        double program_chances[_populationSize]; // Holds each program's chance of being selected (a # between 0 and 1).
+        double program_chances[_populationSize];
         double score_total = GetTotalPopulationScore();
         double rand_val = get_random_real<float>(0.0, 1.0);
 
@@ -163,31 +178,23 @@ namespace bf_code_generator
     std::array<std::string, 2>
         GeneticCodeGenerator::Mate(const std::string& parent1, const std::string& parent2)
     {
-        // We need to find which program is longest.
         std::string min_str = (parent1.length() < parent2.length()) ? parent1 : parent2;
         std::string max_str = (parent1.length() >= parent2.length()) ? parent1 : parent2;
 
-        // Determine a crossover point at random.
         unsigned crosspoint = get_random_int<unsigned>(1, max_str.length() - 1);
 
-        // Find the substring of the program after the crossover point
         std::string max_str_contrib = max_str.substr(crosspoint);
 
-        // Then erase after that point
         max_str.erase(crosspoint);
 
-        /* If the cross-over point is less than the length of the smaller program, then we need to combine part of it with the larger program.
-           If not, then we do nothing and just take part of the larger program and add it to it. */
         if(crosspoint <= min_str.length())
         {
             max_str += min_str.substr(crosspoint);
             min_str.erase(crosspoint);
         }
 
-        // Add the 2nd part of the larger program to the smaller program.
         min_str += max_str_contrib;
 
-        // Call the mutate function on the children which has a small chance of actually causing a mutation.
         return {min_str, max_str};
     }
 
