@@ -30,8 +30,8 @@ namespace bf_code_generator
             if(!interpreter_output.has_value())
                 return _errorScore;
             auto output = interpreter_output.value();
-            double max_score = _goalOutput.length() * CHAR_SIZE;
 
+            double max_score = _goalOutput.length() * CHAR_SIZE;
             std::string min_str, max_str;
             if(output.length() < _goalOutput.length())
             {

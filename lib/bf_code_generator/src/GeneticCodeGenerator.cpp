@@ -76,7 +76,7 @@ namespace bf_code_generator
                         end_time - start_time);
 
                     std::cout << "Time taken: " << duration.count()
-                              << " seconds" << std::endl;
+                              << " milliseconds" << std::endl;
                     std::cout << "Number of generations: " << nGenerations << std::endl;
                     std::cout << "Save source code as a text file? (y/n) ";
 

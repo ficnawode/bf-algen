@@ -43,6 +43,12 @@ namespace
         ASSERT_EQ(Interpreter::Interpret(src), "hello");
     }
 
+    TEST(interpreter_tests, a_loop_test)
+    {
+        std::string src = "++++++++ [>++++++++<-]>+.";
+        ASSERT_EQ(Interpreter::Interpret(src), "A");
+    }
+
     TEST(interpreter_tests, hello_world)
     {
         std::string src =
