@@ -1,0 +1,24 @@
+# BF Code Generation Using Genetic Programming
+
+This project encompasses BF code generation using 
+genetic algorithms.
+
+![genetic programming output](docs/images/algen_wynik.png)
+
+# Setup
+This is a regular cmake project. In the source directory:
+```
+mkdir build && cd build
+```
+```
+cmake ..
+```
+
+and then
+```
+make 
+```
+or 
+```
+ninja
+```

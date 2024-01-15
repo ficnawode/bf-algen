@@ -4,7 +4,6 @@ add_library(${NAME} STATIC)
 
 target_link_libraries(${NAME} 
 PUBLIC
-    Microsoft.GSL::GSL
 )
 
 target_include_directories(${NAME}

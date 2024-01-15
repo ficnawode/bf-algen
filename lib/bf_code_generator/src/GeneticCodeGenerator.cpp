@@ -28,14 +28,12 @@ namespace bf_code_generator
 
         unsigned long generations = 0;
         auto start_time = std::chrono::high_resolution_clock::now();
-        int nGenerations = 0;
 
         while(1)
         {
             SortPopulation();
             int worst_program_index = _population.size() - 1;
             best_program = _population[0].GetProgram();
-            nGenerations++;
 
             // crossover
             for(int i = 0; i < _numOfCrossovers; i++)
@@ -44,15 +42,10 @@ namespace bf_code_generator
                 auto& parent2 = SelectParent(parent1.GetProgram());
 
                 auto children = Mate(parent1.GetProgram(), parent2.GetProgram());
+                // mutation
                 parent1.SetProgram(Mutate(children[0]));
                 parent2.SetProgram(Mutate(children[1]));
             }
-
-            // #pragma omp parralel for
-            // for(auto& g: _population)
-            // {
-            //     g.SetProgram(Mutate(g.GetProgram()));
-            // }
 
             // elitism
             if(!ProgramExists(best_program))
@@ -60,12 +53,13 @@ namespace bf_code_generator
 
             if(!(generations % _displayRate))
             {
-                std::cout << "\n\nBest program evolved so far: " << std::endl;
+                std::cout << "\n\nCurrent best program: " << std::endl;
                 std::cout << best_program << std::endl;
 
                 auto output = bf_interpreter::Interpreter::Interpret(best_program);
                 std::cout << "\nOutput: " << output.value_or("Error") << std::endl;
-                std::cout << "loss func: " << CalculateFitness(best_program) << std::endl;
+                std::cout << "Value of loss function: " << CalculateFitness(best_program)
+                          << std::endl;
 
                 if(output == _goalOutput && !keep_going)
                 {
@@ -77,20 +71,9 @@ namespace bf_code_generator
 
                     std::cout << "Time taken: " << duration.count()
                               << " milliseconds" << std::endl;
-                    std::cout << "Number of generations: " << nGenerations << std::endl;
-                    std::cout << "Save source code as a text file? (y/n) ";
+                    std::cout << "Number of generations: " << generations << std::endl;
 
                     char answer;
-                    std::cin >> answer;
-
-                    if(answer == 'y')
-                    {
-                        std::ofstream srcfile("bfsrc.txt");
-                        srcfile << _goalOutput << ":\n\n" << best_program;
-                        std::cout << "Source code saved as 'bfsrc.txt'\n"
-                                  << std::endl;
-                    }
-
                     std::cout << "Keep evolving for more efficiency? (y/n) ";
                     std::cin >> answer;
 
