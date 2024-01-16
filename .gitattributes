@@ -1,4 +1,4 @@
-*.txt text eol=lf
+* text eol=lf
 *.cmake text eol=lf
 *.in text eol=lf
 *.c text eol=lf

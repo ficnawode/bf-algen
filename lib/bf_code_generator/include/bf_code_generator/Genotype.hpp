@@ -34,12 +34,12 @@ namespace bf_code_generator
             _score = _fitnessFunction(_program);
         }
 
-        auto operator==(const Genotype& g)
+        auto operator==(const Genotype& g) const
         {
             return _score == g.GetScore();
         }
 
-        auto operator<=>(const Genotype& g)
+        auto operator<=>(const Genotype& g) const
         {
             return _score <=> g.GetScore();
         }

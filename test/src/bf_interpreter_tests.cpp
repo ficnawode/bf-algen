@@ -6,6 +6,7 @@ namespace
 {
     using namespace bf_interpreter;
 
+    // NOLINTBEGIN
     TEST(interpreter_tests, hello)
     {
         std::string src =
@@ -66,4 +67,5 @@ namespace
             ">>>++++[<++++++++>-]<+.";
         ASSERT_EQ(Interpreter::Interpret(src), "Hello, World!");
     }
+    // NOLINTEND
 }

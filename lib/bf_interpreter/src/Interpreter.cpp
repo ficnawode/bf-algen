@@ -6,9 +6,8 @@ namespace bf_interpreter
 {
 
     Interpreter::Interpreter(const std::string& source_code) :
-        _program{source_code}, _output{""}
+        _program{source_code}, _output{""}, _tape{}
     {
-        std::memset(_tape.data(), 0, _tape.size());
     }
 
     std::optional<std::string> Interpreter::Interpret(const std::string& source_code)
@@ -86,7 +85,7 @@ namespace bf_interpreter
             _hasError = true;
             return;
         }
-        ++_tape[_tapePointer];
+        ++_tape.at(_tapePointer);
     }
 
     void Interpreter::DecrementValue()
@@ -96,7 +95,7 @@ namespace bf_interpreter
             _hasError = true;
             return;
         }
-        --_tape[_tapePointer];
+        --_tape.at(_tapePointer);
     }
 
     void Interpreter::OutputByte()
@@ -106,7 +105,7 @@ namespace bf_interpreter
             _hasError = true;
             return;
         }
-        _output += _tape[_tapePointer];
+        _output += _tape.at(_tapePointer);
     }
 
     void Interpreter::BeginLoop()
@@ -116,7 +115,7 @@ namespace bf_interpreter
             _hasError = true;
             return;
         }
-        if(!_tape[_tapePointer])
+        if(!_tape.at(_tapePointer))
             _instructionPointer = FindLoopMatch(1) - 1;
     }
 
@@ -127,7 +126,7 @@ namespace bf_interpreter
             _hasError = true;
             return;
         }
-        if(_tape[_tapePointer])
+        if(_tape.at(_tapePointer))
             _instructionPointer = FindLoopMatch(-1);
     }
 

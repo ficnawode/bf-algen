@@ -38,6 +38,6 @@ namespace bf_interpreter
         std::uint16_t _instructionPointer = 0;
         std::uint16_t _totalCycles = 0;
         std::uint16_t _tapePointer = 0;
-        std::array<std::uint8_t, _tapeSize> _tape;
+        std::array<char, _tapeSize> _tape;
     };
 }
