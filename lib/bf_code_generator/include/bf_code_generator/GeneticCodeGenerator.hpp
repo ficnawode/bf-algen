@@ -42,7 +42,6 @@ namespace bf_code_generator
         double _lengthPenalty = 0.01;
         std::uint16_t _displayRate = 6000;
 
-        static constexpr unsigned CHAR_SIZE = 255;
         static constexpr std::array Instructions = {'+', '-', '>', '<', '[', ']', '.'};
     };
 }

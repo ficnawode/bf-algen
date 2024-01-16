@@ -25,7 +25,7 @@ namespace bf_code_generator
                              double score = util::string_distance(output, _goalOutput);
                              score += (program.length() * _lengthPenalty);
 
-                             double maxScore = _goalOutput.length() * CHAR_SIZE;
+                             static const double maxScore = _goalOutput.length() * UINT8_MAX;
                              return maxScore - score;
                          }}
     {
@@ -37,14 +37,13 @@ namespace bf_code_generator
 
     void GeneticCodeGenerator::Run()
     {
-        bool keep_going = false;
-        auto start_time = std::chrono::high_resolution_clock::now();
+        bool keepGoing = false;
+        auto startTime = std::chrono::high_resolution_clock::now();
 
         for(unsigned long generations = 0;; generations++)
         {
             SortPopulation();
-            int worst_program_index = _population.size() - 1;
-            std::string best_program = _population[0].GetProgram();
+            std::string bestProgram = _population[0].GetProgram();
 
             // crossover
             for(int i = 0; i < _numOfCrossovers; i++)
@@ -59,29 +58,29 @@ namespace bf_code_generator
             }
 
             // elitism
-            if(!ProgramExists(best_program))
+            if(!ProgramExists(bestProgram))
             {
-                _population[worst_program_index].SetProgram(best_program);
+                auto& worstProgram = _population[_population.size() - 1];
+                worstProgram.SetProgram(bestProgram);
             }
 
             if(!(generations % _displayRate))
             {
                 std::cout << "\n\nCurrent best program: " << std::endl;
-                std::cout << best_program << std::endl;
+                std::cout << bestProgram << std::endl;
 
-                auto output = bf_interpreter::Interpreter::Interpret(best_program);
+                auto output = bf_interpreter::Interpreter::Interpret(bestProgram);
                 std::cout << "\nOutput: " << output.value_or("Error") << std::endl;
-                std::cout << "Value of loss function: " << CalculateFitness(best_program)
+                std::cout << "Value of loss function: " << CalculateFitness(bestProgram)
                           << std::endl;
 
-                if(output == _goalOutput && !keep_going)
+                if(output == _goalOutput && !keepGoing)
                 {
                     std::cout << "\n\a\a\aProgram evolved." << std::endl;
-                    auto end_time = std::chrono::high_resolution_clock::now();
 
-                    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-                        end_time - start_time);
-
+                    auto endTime = std::chrono::high_resolution_clock::now();
+                    auto duration =
+                        std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
                     std::cout << "Time taken: " << duration.count()
                               << " milliseconds" << std::endl;
                     std::cout << "Number of generations: " << generations << std::endl;
@@ -95,7 +94,7 @@ namespace bf_code_generator
                     _mutationRate = 0.05;
                     _lengthPenalty = 0.01;
 
-                    keep_going = true;
+                    keepGoing = true;
                 }
             }
 
@@ -105,16 +104,15 @@ namespace bf_code_generator
 
     char GeneticCodeGenerator::GetRandomInstruction()
     {
-        auto min = 0;
-        auto max = Instructions.size();
-        auto index = get_random<size_t>(min, max);
+        static constexpr auto max = Instructions.size() - 1;
+        auto index = get_random<size_t>(0, max);
         return Instructions[index];
     }
 
     std::string GeneticCodeGenerator::CreateRandomProgram() const
     {
-        std::string program;
         uint16_t program_size = get_random<uint16_t>(_minProgramSize, _maxProgramSize);
+        std::string program;
 
         for(unsigned i = 0; i < program_size; ++i)
         {

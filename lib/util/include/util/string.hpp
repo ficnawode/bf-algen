@@ -26,14 +26,14 @@ namespace util
         double score = 0;
         for(std::size_t i = 0; i < maxStr.length(); i++)
         {
-            uint16_t minChar;
+            std::uint16_t minChar;
             if(i < minStr.length())
             {
                 minChar = minStr[i];
             }
             else
             {
-                minChar = maxStr[i] + 255;
+                minChar = maxStr[i] + UINT8_MAX;
             }
             score += abs(maxStr[i] - minChar);
         }
