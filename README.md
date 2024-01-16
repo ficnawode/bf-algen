@@ -22,3 +22,12 @@ or
 ```
 ninja
 ```
+
+to launch simply
+```
+./build/exec/exec <desired output>
+```
+for example:
+```
+./build/exec/exec hello!
+```
