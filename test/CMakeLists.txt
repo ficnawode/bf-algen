@@ -20,7 +20,8 @@ target_sources(${NAME}
 PRIVATE
     src/bf_codegen_tests.cpp
     src/bf_interpreter_tests.cpp
-    src/util_tests.cpp
+    src/util_rand_tests.cpp
+    src/util_string_tests.cpp
 )
 
 add_custom_target(${NAME}.run

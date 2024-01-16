@@ -9,4 +9,5 @@ target_include_directories(${NAME} INTERFACE
 target_sources(${NAME}
 PRIVATE
     include/util/random.hpp
+    include/util/string.hpp
 )

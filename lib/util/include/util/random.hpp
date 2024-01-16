@@ -9,7 +9,7 @@ namespace util
     {
         static_assert(std::is_integral_v<Number> || std::is_floating_point_v<Number>);
 
-        static constexpr std::random_device rd;
+        static std::random_device rd;
         static std::mt19937 gen(rd());
         if constexpr(std::is_integral_v<Number>)
         {
