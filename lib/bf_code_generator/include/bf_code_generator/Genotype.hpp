@@ -1,5 +1,4 @@
 #pragma once
-#include "bf_code_generator/fwd.hpp"
 
 #include <functional>
 #include <string>
@@ -17,6 +16,7 @@ namespace bf_code_generator
 
         Genotype(Genotype&& g) = default;
         Genotype& operator=(Genotype&& g) = default;
+        ~Genotype() = default;
 
         std::string GetProgram() const
         {

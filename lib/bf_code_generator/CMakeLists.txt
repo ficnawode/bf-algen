@@ -5,6 +5,7 @@ add_library(${NAME} STATIC)
 target_link_libraries(${NAME} 
 PUBLIC
     bf_interpreter
+PRIVATE
     util
 )
 
@@ -17,6 +18,5 @@ target_sources(${NAME}
 PRIVATE
     include/bf_code_generator/GeneticCodeGenerator.hpp
     include/bf_code_generator/Genotype.hpp
-    include/bf_code_generator/fwd.hpp
     src/GeneticCodeGenerator.cpp
 )
