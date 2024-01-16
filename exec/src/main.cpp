@@ -1,10 +1,11 @@
 #include <iostream>
+#include <span>
 #include "bf_code_generator/GeneticCodeGenerator.hpp"
 #include "bf_interpreter/Interpreter.hpp"
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> args(argv, argv + argc);
+    auto args = std::span(argv, argc);
     if(args.size() != 2)
     {
         std::cout << "incorrect number of arguments! use format ./exec <goal "
