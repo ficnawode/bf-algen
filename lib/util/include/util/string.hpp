@@ -18,7 +18,7 @@ namespace util
         return s2;
     }
 
-    double hamming_distance(const std::string& s1, const std::string& s2)
+    double string_distance(const std::string& s1, const std::string& s2)
     {
         const std::string minStr = get_shorter_string(s1, s2);
         const std::string maxStr = get_longer_string(s1, s2);

@@ -22,7 +22,7 @@ namespace bf_code_generator
                                  return _errorScore;
                              auto output = interpreter_output.value();
 
-                             double score = util::hamming_distance(output, _goalOutput);
+                             double score = util::string_distance(output, _goalOutput);
                              score += (program.length() * _lengthPenalty);
 
                              double maxScore = _goalOutput.length() * CHAR_SIZE;
