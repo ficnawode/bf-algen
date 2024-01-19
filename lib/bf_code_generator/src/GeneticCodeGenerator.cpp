@@ -24,7 +24,7 @@ namespace bf_code_generator
     void GeneticCodeGenerator::Run()
     {
         bool keepGoing = false;
-        auto startTime = std::chrono::high_resolution_clock::now();
+        const auto startTime = std::chrono::high_resolution_clock::now();
 
         for(unsigned long generations = 0;; generations++)
         {
@@ -58,24 +58,24 @@ namespace bf_code_generator
 
             if(!(generations % _displayRate))
             {
-                std::cout << "\n\nCurrent best program: " << std::endl;
-                std::cout << bestProgram << std::endl;
+                std::cout << "\n\nCurrent best program: " << '\n';
+                std::cout << bestProgram << '\n';
 
-                auto output = bf_interpreter::Interpreter::Interpret(bestProgram);
-                std::cout << "\nOutput: " << output.value_or("Error") << std::endl;
+                const auto output = bf_interpreter::Interpreter::Interpret(bestProgram);
+                std::cout << "\nOutput: " << output.value_or("Error") << '\n';
                 std::cout << "Value of loss function: " << CalculateFitness(bestProgram)
-                          << std::endl;
+                          << '\n';
 
                 if(output == _goalOutput && !keepGoing)
                 {
-                    std::cout << "\n\a\a\aProgram evolved." << std::endl;
+                    std::cout << "\n\a\a\aProgram evolved." << '\n';
 
-                    auto endTime = std::chrono::high_resolution_clock::now();
-                    auto duration =
+                    const auto endTime = std::chrono::high_resolution_clock::now();
+                    const auto duration =
                         std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
                     std::cout << "Time taken: " << duration.count()
-                              << " milliseconds" << std::endl;
-                    std::cout << "Number of generations: " << generations << std::endl;
+                              << " milliseconds" << '\n';
+                    std::cout << "Number of generations: " << generations << '\n';
 
                     char answer = 'n';
                     std::cout << "Keep evolving for more efficiency? (y/n) ";
@@ -94,13 +94,14 @@ namespace bf_code_generator
     char GeneticCodeGenerator::GetRandomInstruction()
     {
         static constexpr auto max = Instructions.size() - 1;
-        auto index = get_random<size_t>(0, max);
+        auto index = get_random<std::size_t>(0, max);
         return Instructions.at(index);
     }
 
     std::string GeneticCodeGenerator::CreateRandomProgram() const
     {
-        auto program_size = get_random<uint16_t>(_minProgramSize, _maxProgramSize);
+        const auto program_size =
+            get_random<std::uint16_t>(_minProgramSize, _maxProgramSize);
         std::string program;
 
         for(std::uint16_t i = 0; i < program_size; ++i)
@@ -112,10 +113,10 @@ namespace bf_code_generator
 
     double GeneticCodeGenerator::CalculateFitness(const std::string& program)
     {
-        auto interpreter_output = bf_interpreter::Interpreter::Interpret(program);
+        const auto interpreter_output = bf_interpreter::Interpreter::Interpret(program);
         if(!interpreter_output.has_value())
             return _errorScore;
-        auto output = interpreter_output.value();
+        const auto output = interpreter_output.value();
 
         double score = util::string_distance(output, _goalOutput);
         score += (static_cast<double>(program.length()) * _lengthPenalty);
@@ -126,36 +127,32 @@ namespace bf_code_generator
 
     std::string GeneticCodeGenerator::Mutate(std::string program)
     {
-        static const auto AddRandomInstruction = [&](std::string program, std::uint16_t index)
+        static const auto AddRandomInstruction = [&](std::string& program, std::uint16_t index)
         {
-            if((program.length()) < _maxProgramSize)
+            if(program.length() < _maxProgramSize)
                 program.insert(index, 1, GetRandomInstruction());
-            return program;
         };
 
-        static const auto RemoveInstruction = [&](std::string program, std::uint16_t index)
+        static const auto RemoveInstruction = [&](std::string& program, std::uint16_t index)
         {
             if(program.length() > _minProgramSize)
                 program.erase(index, 1);
-            return program;
         };
 
         static const auto ReplaceWithRandomInstruction =
-            [&](std::string program, std::uint16_t index)
-        {
-            program[index] = GetRandomInstruction();
-            return program;
-        };
+            [&](std::string& program, std::uint16_t index)
+        { program[index] = GetRandomInstruction(); };
 
-        static const std::array<std::function<std::string(std::string, std::uint16_t)>, 3> mutationFunctions = {
+        static const std::array<std::function<void(std::string&, std::uint16_t)>, 3> mutationFunctions = {
             AddRandomInstruction, RemoveInstruction, ReplaceWithRandomInstruction};
+
         for(size_t i = 0; i < program.length(); ++i)
         {
             if(_mutationRate >= get_random<float>(0.0, 1.0))
             {
-                auto mutation_type =
+                const auto mutation_type =
                     get_random<std::size_t>(0, mutationFunctions.size() - 1);
-                program = mutationFunctions.at(mutation_type)(program, i);
+                mutationFunctions.at(mutation_type)(program, i);
             }
         }
         return program;
@@ -164,17 +161,17 @@ namespace bf_code_generator
     double GeneticCodeGenerator::GetTotalPopulationScore() const
     {
         return std::accumulate(
-            _population.begin(),
-            _population.end(),
+            _population.cbegin(),
+            _population.cend(),
             0,
-            [](double accumulator, const Genotype& g)
+            [](const double accumulator, const Genotype& g)
             { return accumulator + g.score; });
     }
 
     Genotype& GeneticCodeGenerator::SelectParent(const std::string otherParent)
     {
-        auto selectionThreshhold = get_random<double>(0.0, 1.0);
-        double totalScore = GetTotalPopulationScore();
+        const auto selectionThreshhold = get_random<double>(0.0, 1.0);
+        const double totalScore = GetTotalPopulationScore();
         double previousChance = 0;
         for(auto& g: _population)
         {
@@ -192,7 +189,7 @@ namespace bf_code_generator
     {
         std::string minStr = util::get_shorter_string(parent1, parent2);
         std::string maxStr = util::get_longer_string(parent1, parent2);
-        auto crosspoint = get_random<std::size_t>(1, maxStr.length() - 1);
+        const auto crosspoint = get_random<std::size_t>(1, maxStr.length() - 1);
 
         std::string maxStringContribution = maxStr.substr(crosspoint);
         maxStr.erase(crosspoint);
@@ -209,9 +206,9 @@ namespace bf_code_generator
     bool GeneticCodeGenerator::ProgramExists(const std::string& program)
     {
         return std::find_if(
-                   _population.begin(),
-                   _population.end(),
+                   _population.cbegin(),
+                   _population.cend(),
                    [&](const Genotype& g)
-                   { return g.program == program; }) != _population.end();
+                   { return g.program == program; }) != _population.cend();
     }
 }
