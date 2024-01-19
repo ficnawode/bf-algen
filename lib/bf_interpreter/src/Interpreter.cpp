@@ -1,6 +1,5 @@
 #include "bf_interpreter/Interpreter.hpp"
 #include <cassert>
-#include <cstring>
 
 namespace bf_interpreter
 {
@@ -13,10 +12,10 @@ namespace bf_interpreter
     std::optional<std::string> Interpreter::Interpret(const std::string& source_code)
     {
         Interpreter interpreter = Interpreter(source_code);
-        return interpreter.Interpret();
+        return interpreter.Run();
     }
 
-    std::optional<std::string> Interpreter::Interpret()
+    std::optional<std::string> Interpreter::Run()
     {
         while(_instructionPointer < _program.length())
         {
@@ -32,6 +31,11 @@ namespace bf_interpreter
 
     void Interpreter::HandleOperation(const char op)
     {
+        if(_tapePointer >= _tapeSize || _tapePointer < 0)
+        {
+            _hasError = true;
+            return;
+        }
         switch(op)
         {
         case '>':
@@ -61,98 +65,54 @@ namespace bf_interpreter
     void Interpreter::IncrementPointer()
     {
         ++_tapePointer;
-
-        if(_tapePointer >= _tapeSize)
-        {
-            _hasError = true;
-        }
     }
 
     void Interpreter::DecrementPointer()
     {
         --_tapePointer;
-
-        if(_tapePointer < 0)
-        {
-            _hasError = true;
-        }
     }
 
     void Interpreter::IncrementValue()
     {
-        if(_tapePointer >= _tapeSize || _tapePointer < 0)
-        {
-            _hasError = true;
-            return;
-        }
         ++_tape.at(_tapePointer);
     }
 
     void Interpreter::DecrementValue()
     {
-        if(_tapePointer >= _tapeSize || _tapePointer < 0)
-        {
-            _hasError = true;
-            return;
-        }
         --_tape.at(_tapePointer);
     }
 
     void Interpreter::OutputByte()
     {
-        if(_tapePointer >= _tapeSize || _tapePointer < 0)
-        {
-            _hasError = true;
-            return;
-        }
         _output += _tape.at(_tapePointer);
     }
 
     void Interpreter::BeginLoop()
     {
-        if(_tapePointer >= _tapeSize || _tapePointer < 0)
-        {
-            _hasError = true;
-            return;
-        }
-        if(!_tape.at(_tapePointer))
-            _instructionPointer = FindLoopMatch(1) - 1;
+        if(_tape.at(_tapePointer) == 0)
+            _instructionPointer = FindLoopMatch(Direction::Right) - 1;
     }
 
     void Interpreter::EndLoop()
     {
-        if(_tapePointer >= _tapeSize || _tapePointer < 0)
-        {
-            _hasError = true;
-            return;
-        }
-        if(_tape.at(_tapePointer))
-            _instructionPointer = FindLoopMatch(-1);
+        if(_tape.at(_tapePointer != 0))
+            _instructionPointer = FindLoopMatch(Direction::Left);
     }
 
-    std::uint16_t Interpreter::FindLoopMatch(const std::int8_t direction)
+    std::uint16_t Interpreter::FindLoopMatch(const Direction direction)
     {
-        assert(direction == -1 || direction == 1);
-        uint16_t numNestedLoops = 1;
-        uint16_t instructionPointerTmp = _instructionPointer + direction;
-
-        if(instructionPointerTmp == INT16_MAX)
-        {
-            _hasError = true;
-            return 0;
-        }
+        std::uint16_t numNestedLoops = 1;
+        std::size_t instructionPointerTmp = _instructionPointer + direction;
 
         while(numNestedLoops > 0)
         {
-            if(instructionPointerTmp == 0 ||
-               instructionPointerTmp >= static_cast<std::uint16_t>(_program.length()))
+            if(instructionPointerTmp <= 0 || instructionPointerTmp >= _program.length())
             {
                 _hasError = true;
                 return 0;
             }
 
             char c = _program[instructionPointerTmp];
-
             if(c == '[')
                 numNestedLoops += direction;
             else if(c == ']')

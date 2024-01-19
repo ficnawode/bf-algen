@@ -14,7 +14,7 @@ namespace bf_interpreter
 
     private:
         Interpreter(const std::string& source_code);
-        std::optional<std::string> Interpret();
+        std::optional<std::string> Run();
 
         void HandleOperation(const char op);
 
@@ -26,14 +26,19 @@ namespace bf_interpreter
         void BeginLoop();
         void EndLoop();
 
-        std::uint16_t FindLoopMatch(std::int8_t direction);
+        enum Direction
+        {
+            Left = -1,
+            Right = 1
+        };
+        std::uint16_t FindLoopMatch(const Direction direction);
 
         const std::string& _program;
         std::string _output;
         bool _hasError = false;
 
-        static constexpr std::uint16_t _maxCycles = 10 * 1024;
-        static constexpr std::uint16_t _tapeSize = 16 * 1024;
+        static constexpr std::uint16_t _maxCycles = 1024;
+        static constexpr std::uint16_t _tapeSize = 512;
 
         std::uint16_t _instructionPointer = 0;
         std::uint16_t _totalCycles = 0;

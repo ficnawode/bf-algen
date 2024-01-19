@@ -17,30 +17,27 @@ namespace bf_code_generator
         void Run();
 
     private:
+        double CalculateFitness(const std::string& program);
         std::string Mutate(std::string program);
-        Genotype& SelectParent(const std::string other_parent = "");
+        Genotype& SelectParent(const std::string otherParent = "");
         std::array<std::string, 2> Mate(const std::string& parent1, const std::string& parent2);
-
         bool ProgramExists(const std::string& program);
         double GetTotalPopulationScore() const;
-        void SortPopulation();
 
         std::string CreateRandomProgram() const;
         static char GetRandomInstruction();
 
-        const std::function<double(std::string&)> CalculateFitness;
-
         const std::string _goalOutput;
         std::vector<Genotype> _population;
 
-        std::uint16_t _minProgramSize = 10;
-        std::uint16_t _maxProgramSize = 500;
-        std::uint16_t _populationSize = 12;
-        std::uint16_t _numOfCrossovers = 2;
-        double _mutationRate = 0.01;
-        double _errorScore = 1.0;
-        double _lengthPenalty = 0.01;
-        std::uint16_t _displayRate = 6000;
+        const std::uint16_t _minProgramSize = 10;
+        const std::uint16_t _maxProgramSize = 500;
+        const std::uint16_t _populationSize = 12;
+        const std::uint16_t _numOfCrossovers = 2;
+        const double _mutationRate = 0.01;
+        const double _errorScore = 1.0;
+        const double _lengthPenalty = 0.01;
+        const std::uint16_t _displayRate = 6000;
 
         static constexpr std::array Instructions = {'+', '-', '>', '<', '[', ']', '.'};
     };

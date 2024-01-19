@@ -13,26 +13,11 @@ namespace bf_code_generator
     using namespace util;
 
     GeneticCodeGenerator::GeneticCodeGenerator(const std::string goalOutput) :
-        _goalOutput{goalOutput},
-        CalculateFitness{
-            [&](const std::string& program)
-            {
-                auto interpreter_output = bf_interpreter::Interpreter::Interpret(program);
-                if(!interpreter_output.has_value())
-                    return _errorScore;
-                auto output = interpreter_output.value();
-
-                double score = util::string_distance(output, _goalOutput);
-                score += (static_cast<double>(program.length()) * _lengthPenalty);
-
-                static const auto maxScore =
-                    static_cast<double>(_goalOutput.length() * UINT8_MAX);
-                return maxScore - score;
-            }}
+        _goalOutput{goalOutput}
     {
         for(int i = 0; i < _populationSize; i++)
         {
-            _population.emplace_back(CreateRandomProgram(), CalculateFitness);
+            _population.emplace_back(CreateRandomProgram(), 0);
         }
     }
 
@@ -43,26 +28,32 @@ namespace bf_code_generator
 
         for(unsigned long generations = 0;; generations++)
         {
-            SortPopulation();
-            std::string bestProgram = _population[0].GetProgram();
+            // Score the population
+            for(auto& g: _population)
+            {
+                g.score = CalculateFitness(g.program);
+            }
+
+            const auto [worstGenotype, bestGenotype] =
+                std::minmax_element(_population.begin(), _population.end());
+            auto bestProgram = bestGenotype->program;
 
             // crossover
             for(int i = 0; i < _numOfCrossovers; i++)
             {
                 auto& parent1 = SelectParent();
-                auto& parent2 = SelectParent(parent1.GetProgram());
+                auto& parent2 = SelectParent(parent1.program);
 
-                auto children = Mate(parent1.GetProgram(), parent2.GetProgram());
+                auto children = Mate(parent1.program, parent2.program);
                 // mutation
-                parent1.SetProgram(Mutate(children[0]));
-                parent2.SetProgram(Mutate(children[1]));
+                parent1.program = Mutate(children[0]);
+                parent2.program = Mutate(children[1]);
             }
 
             // elitism
             if(!ProgramExists(bestProgram))
             {
-                auto& worstProgram = _population[_population.size() - 1];
-                worstProgram.SetProgram(bestProgram);
+                worstGenotype->program = bestProgram;
             }
 
             if(!(generations % _displayRate))
@@ -119,6 +110,20 @@ namespace bf_code_generator
         return program;
     }
 
+    double GeneticCodeGenerator::CalculateFitness(const std::string& program)
+    {
+        auto interpreter_output = bf_interpreter::Interpreter::Interpret(program);
+        if(!interpreter_output.has_value())
+            return _errorScore;
+        auto output = interpreter_output.value();
+
+        double score = util::string_distance(output, _goalOutput);
+        score += (static_cast<double>(program.length()) * _lengthPenalty);
+
+        static const auto maxScore = static_cast<double>(_goalOutput.length() * UINT8_MAX);
+        return maxScore - score;
+    }
+
     std::string GeneticCodeGenerator::Mutate(std::string program)
     {
         static const auto AddRandomInstruction = [&](std::string program, std::uint16_t index)
@@ -163,24 +168,19 @@ namespace bf_code_generator
             _population.end(),
             0,
             [](double accumulator, const Genotype& g)
-            { return accumulator + g.GetScore(); });
+            { return accumulator + g.score; });
     }
 
-    void GeneticCodeGenerator::SortPopulation()
+    Genotype& GeneticCodeGenerator::SelectParent(const std::string otherParent)
     {
-        std::sort(_population.begin(), _population.end(), std::greater<>());
-    }
-
-    Genotype& GeneticCodeGenerator::SelectParent(const std::string other_parent)
-    {
-        double totalScore = GetTotalPopulationScore();
         auto selectionThreshhold = get_random<double>(0.0, 1.0);
+        double totalScore = GetTotalPopulationScore();
         double previousChance = 0;
         for(auto& g: _population)
         {
-            double currentChance = g.GetScore() / totalScore + previousChance;
+            double currentChance = g.score / totalScore + previousChance;
 
-            if(currentChance > selectionThreshhold && g.GetProgram() != other_parent)
+            if(currentChance > selectionThreshhold && g.program != otherParent)
                 return g;
             previousChance = currentChance;
         }
@@ -212,6 +212,6 @@ namespace bf_code_generator
                    _population.begin(),
                    _population.end(),
                    [&](const Genotype& g)
-                   { return g.GetProgram() == program; }) != _population.end();
+                   { return g.program == program; }) != _population.end();
     }
 }
