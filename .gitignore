@@ -6,3 +6,4 @@ cmake-build-debug
 .pytest_cache
 *.egg-info
 *.pyc
+.vscode
