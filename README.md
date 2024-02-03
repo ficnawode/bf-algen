@@ -1,3 +1,5 @@
+![build workflow badge](https://github.com/ficnawode/bf-algen/actions/workflows/cmake-single-platform.yml/badge.svg)
+
 # BF Code Generation Using Genetic Programming
 
 This project encompasses BF code generation using 
